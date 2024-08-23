@@ -76,7 +76,7 @@ def simplify_polygon(polygon_coords, tolerance=6):
     simplified_coords = list(simplified_polygon.exterior.coords)
     return simplified_coords
 
-def parse_line(line,width,height, classes_file_path):
+def parse_line(line,width,height, labels):
     """
     Parses a line of text and converts it into a JSON-like dictionary format.
 
@@ -98,7 +98,7 @@ def parse_line(line,width,height, classes_file_path):
     # points = simplify_polygon(points)
     # print("Count After Simplyfy:",len(points))
     
-    labels = labels_to_dict(classes_file_path)
+    # labels = labels_to_dict(classes_file_path)
 
 
     label = labels.get(label_id, "unknown")
@@ -113,7 +113,7 @@ def parse_line(line,width,height, classes_file_path):
         "mask": None
     }
 
-def create_annotation_json(input_file, output_file, classes_file_path, image_name, width, height, version="5.4.1"):
+def create_annotation_json(input_file, output_file, labels, image_name, width, height, version="5.4.1"):
     """
     Creates a JSON object in the specified annotation format from a text file.
 
@@ -129,7 +129,11 @@ def create_annotation_json(input_file, output_file, classes_file_path, image_nam
     with open(input_file, 'r') as f:
         for line in f:
             if line.strip():  # Ignore empty lines
-                shape = parse_line(line, width, height, classes_file_path)
+                shape = parse_line(
+                    line=line, 
+                    width=width, 
+                    height= width, 
+                    labels=labels)
                 shapes.append(shape)
     
     # Create JSON object
@@ -166,9 +170,10 @@ def get_image_dimensions_cv2(image_path):
 
 if __name__ == "__main__":
     # classes_file_path: text file with class names in each line
-    classes_file_path = "/home/shreeram/workspace/ambl/autodistillation_roboflow/test_labelme/classes.txt"
+    classes_file_path = "/home/shreeram/workspace/ambl/labelme_build/labelme/conversion_script/classes.txt"
     imageData= "null"
-    input_labels_dir = "/home/shreeram/workspace/ambl/autodistillation_roboflow/test_labelme/labels"
+    # input_labels_dir = "/home/shreeram/workspace/ambl/autodistillation_roboflow/test_labelme/labels"
+    input_labels_dir = "/home/shreeram/workspace/ambl/labelme_build/labelme/conversion_script/output_yolo_seg_annotation"
     input_images_dir = "/home/shreeram/workspace/ambl/autodistillation_roboflow/test_labelme/images"
     output_dir = "output_json_annotation"
 
@@ -179,6 +184,7 @@ if __name__ == "__main__":
     image_lists = sorted(os.listdir(input_images_dir))
     annotation_file_lists = sorted(os.listdir(input_labels_dir))
 
+    classes_name = labels_to_dict(classes_file_path)
 
 
     for imgfile_name, anno_filename in zip(image_lists, annotation_file_lists):
@@ -192,7 +198,7 @@ if __name__ == "__main__":
         create_annotation_json(
             input_file=os.path.join(input_labels_dir, anno_filename), 
             output_file=output_file, 
-            classes_file_path=classes_file_path,
+            labels=classes_name,
             image_name=imgfile_name, 
             width=image_width, 
             height=image_height
