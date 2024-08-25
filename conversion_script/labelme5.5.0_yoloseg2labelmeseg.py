@@ -50,7 +50,7 @@ def unnormalize_points(points, width, height):
     """
     return [(x * width, y * height) for x, y in points]
 
-def simplify_polygon(polygon_coords, tolerance=6):
+def simplify_polygon(polygon_coords, tolerance=5):
     """
     Simplifies a polygon based on the tolerance value.
     
@@ -95,7 +95,7 @@ def parse_line(line,width,height, labels):
      # Unnormalize points
     points = unnormalize_points(points, width, height)
     # print("Count Before Simplyfy:",len(points))
-    # points = simplify_polygon(points)
+    points = simplify_polygon(points)
     # print("Count After Simplyfy:",len(points))
     
     # labels = labels_to_dict(classes_file_path)
@@ -132,7 +132,7 @@ def create_annotation_json(input_file, output_file, labels, image_name, width, h
                 shape = parse_line(
                     line=line, 
                     width=width, 
-                    height= width, 
+                    height= height, 
                     labels=labels)
                 shapes.append(shape)
     
