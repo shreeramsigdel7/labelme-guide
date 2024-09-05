@@ -89,7 +89,7 @@ def parse_line(line,width,height, labels):
         dict: A dictionary with label and points.
     """
     parts = line.strip().split()
-    label_id = int(parts[0])
+    label_id = int(float(parts[0]))
     points = [(float(parts[i]), float(parts[i+1])) for i in range(1, len(parts), 2)]
     
      # Unnormalize points
